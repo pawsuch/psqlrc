@@ -1,0 +1,27 @@
+\echo '\n'
+\echo '#     #  #######  #         #####   #######  #     #  #######'
+\echo '#  #  #  #        #        #     #  #     #  ##   ##  #'
+\echo '#  #  #  #        #        #        #     #  # # # #  #'
+\echo '#  #  #  #####    #        #        #     #  #  #  #  #####'
+\echo '#  #  #  #        #        #        #     #  #     #  #'
+\echo '#  #  #  #        #        #     #  #     #  #     #  #'
+\echo ' ## ##   #######  #######   #####   #######  #     #  #######'
+\echo 'Connected to:'
+\pset tuples_only true
+select setting from pg_settings where name='unix_socket_directories';
+\echo '\nAvailable databases:'
+\echo '===================='
+with x as (select datname from pg_database where datname not in ('postgres','template0','template1')) select string_agg(datname,', ') from x;
+\echo '\nConnected clients:'
+select count(*) from pg_stat_activity;
+\echo 'Clients by state:'
+select count(*),state from pg_stat_activity group by 2;
+
+\set clients_by_state 'select count(*),state from pg_stat_activity group by 2;'
+\set clients_idle 'select count(*),state from pg_stat_activity where state <> \'active\' group by 2;'
+\set dat_age 'select datname,age(datfrozenxid) from pg_database ;'
+\set table_age 'SELECT c.oid::regclass AS table_name, GREATEST(age(c.relfrozenxid), age(t.relfrozenxid)) AS age, pg_table_size(c.oid::regclass) AS table_size FROM pg_class c LEFT JOIN pg_class t ON c.reltoastrelid = t.oid WHERE c.relkind = \'r\'::"char"ORDER BY GREATEST(age(c.relfrozenxid), age(t.relfrozenxid)) DESC;'
+
+\pset tuples_only false
+\set PROMPT1 '%n [%/] > '
+\set PROMPT2 ''
