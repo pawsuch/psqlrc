@@ -32,3 +32,7 @@ with x as (select  count(*), state from pg_stat_activity where datname is not nu
 \set replica_slots 'select * from pg_replication_slots';
 \set replica_stats 'select * from pg_stat_replication';
 \set slow_queries 'SELECT (total_time / 1000 / 60) as total_minutes, (total_time/calls) as average_time, query FROM pg_stat_statements ORDER BY 1 DESC LIMIT 100;'
+
+\pset border 1
+\pset linestyle unicode
+\set PROMPT1 '%`printf "\\U1f4aa\n"` %[%033[1;33;40m%]%n@%/%R%[%033[0m%]%# '
