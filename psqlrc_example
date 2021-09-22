@@ -1,4 +1,3 @@
-\echo '\n'
 \echo '#     #  #######  #         #####   #######  #     #  #######'
 \echo '#  #  #  #        #        #     #  #     #  ##   ##  #'
 \echo '#  #  #  #        #        #        #     #  # # # #  #'
@@ -6,22 +5,29 @@
 \echo '#  #  #  #        #        #        #     #  #     #  #'
 \echo '#  #  #  #        #        #     #  #     #  #     #  #'
 \echo ' ## ##   #######  #######   #####   #######  #     #  #######'
-\echo 'Connected to:'
-\pset tuples_only true
-select setting from pg_settings where name='unix_socket_directories';
-\echo '\nAvailable databases:'
+\echo '\n'
+
+\pset tuples_only on
+\echo 'Available Databases:'
 \echo '===================='
-with x as (select datname from pg_database where datname not in ('postgres','template0','template1')) select string_agg(datname,', ') from x;
-\echo '\nConnected clients:'
-select count(*) from pg_stat_activity;
+with x as (select datname from pg_database where datname not in ('template0','template1','postgres') order by 1 ) select string_agg(datname,', ') as DBs from x;
+
+\echo 'Logged-in/max-allowed Users:'
+\echo '============================'
+with x as ( select count(*) as v from pg_stat_activity union select setting::int from pg_settings where name='max_connections')
+select string_agg(v::text,' / ') from x;
 \echo 'Clients by state:'
-select count(*),state from pg_stat_activity group by 2;
+\echo '================='
+with x as (select  count(*), state from pg_stat_activity where datname is not null group by 2) select string_agg( concat (count,' ',state),', ') as conns_state from x;
+
+\pset tuples_only off
+
+\echo 'Please behave my friend.'
+\echo '\n'
 
 \set clients_by_state 'select count(*),state from pg_stat_activity group by 2;'
 \set clients_idle 'select count(*),state from pg_stat_activity where state <> \'active\' group by 2;'
 \set dat_age 'select datname,age(datfrozenxid) from pg_database ;'
 \set table_age 'SELECT c.oid::regclass AS table_name, GREATEST(age(c.relfrozenxid), age(t.relfrozenxid)) AS age, pg_table_size(c.oid::regclass) AS table_size FROM pg_class c LEFT JOIN pg_class t ON c.reltoastrelid = t.oid WHERE c.relkind = \'r\'::"char"ORDER BY GREATEST(age(c.relfrozenxid), age(t.relfrozenxid)) DESC;'
-
-\pset tuples_only false
-\set PROMPT1 '%n [%/] > '
-\set PROMPT2 ''
+\set replica_slots 'select * from pg_replication_slots';
+\set replica_stats 'select * from pg_stat_replication';
