@@ -15,7 +15,7 @@ with x as (select datname from pg_database where datname not in ('template0','te
 
 \echo 'Logged-in/max-allowed Users:'
 \echo '============================'
-with x as ( select count(*) as v from pg_stat_activity union select setting::int from pg_settings where name='max_connections')
+with x as ( select count(*) as v from pg_stat_activity union select setting::int from pg_settings where name='max_connections' order by 1)
 select string_agg(v::text,' / ') from x;
 \echo 'Clients by state:'
 \echo '================='
