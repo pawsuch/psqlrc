@@ -7,7 +7,7 @@
 \echo ' ## ##   #######  #######   #####   #######  #     #  #######'
 \echo '\n'
 \set QUIET on
-\pset pager off 
+\pset pager less 
 \pset tuples_only on
 \echo 'Available Databases:'
 \echo '===================='
