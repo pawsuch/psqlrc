@@ -7,7 +7,7 @@
 \echo ' ## ##   #######  #######   #####   #######  #     #  #######'
 \echo '\n'
 \set QUIET on
-\pset pager less 
+\pset pager on 
 \pset tuples_only on
 \echo 'Available Databases:'
 \echo '===================='
@@ -35,6 +35,7 @@ with x as (select  count(*), state from pg_stat_activity where datname is not nu
 \set slow_queries 'SELECT (total_time / 1000 / 60) as total_minutes, (total_time/calls) as average_time, query FROM pg_stat_statements ORDER BY 1 DESC LIMIT 100;'
 
 \pset border 1
+\setenv PAGER 'less -S'
 \pset linestyle unicode
 \set PROMPT1 '%`printf "\\U1f4aa\n"` %[%033[1;33m%]%n@%/%R%[%033[0m%]%# '
 \set QUIET off
