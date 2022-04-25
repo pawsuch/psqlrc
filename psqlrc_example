@@ -1,5 +1,5 @@
 \set QUIET on
-\pset pager on 
+\pset pager on
 \pset tuples_only on
 \echo 'Available Databases:'
 \echo '===================='
@@ -7,10 +7,9 @@ with x as (select datname from pg_database where datname not in ('template0','te
 
 \echo 'Logged-in/max-allowed Users:'
 \echo '============================'
-with x as ( select count(*) as v from pg_stat_activity union select setting::int from pg_settings where name='max_connections' order by 1)
-select string_agg(v::text,' / ') from x;
+with x as ( select count(*) as v from pg_stat_activity union select setting::int from pg_settings where name='max_connections' order by 1) select string_agg(v::text,' / ') from x;
 \echo 'Clients by state:'
-\echo '================='
+\echo '=================
 with x as (select  count(*), state from pg_stat_activity where datname is not null group by 2) select string_agg( concat (count,' ',state),', ') as conns_state from x;
 
 \pset tuples_only off
@@ -23,11 +22,12 @@ with x as (select  count(*), state from pg_stat_activity where datname is not nu
 \set dat_age 'select datname,age(datfrozenxid) from pg_database ;'
 \set table_age 'SELECT c.oid::regclass AS table_name, GREATEST(age(c.relfrozenxid), age(t.relfrozenxid)) AS age, pg_table_size(c.oid::regclass) AS table_size FROM pg_class c LEFT JOIN pg_class t ON c.reltoastrelid = t.oid WHERE c.relkind = \'r\'::"char"ORDER BY GREATEST(age(c.relfrozenxid), age(t.relfrozenxid)) DESC;'
 \set replica_slots 'select * from pg_replication_slots';
-\set replica_stats 'select * from pg_stat_replication';
+\set replica_stats 'select pid, usename, application_name, client_addr , client_hostname,  state,  sync_state from pg_stat_replication';
+\set replica_stats_all 'select * from pg_stat_replication';
 \set slow_queries 'SELECT (total_time / 1000 / 60) as total_minutes, (total_time/calls) as average_time, query FROM pg_stat_statements ORDER BY 1 DESC LIMIT 100;'
-
 \pset border 1
 \setenv PAGER 'less -S'
 \pset linestyle unicode
-\set PROMPT1 '%`printf "\\U1f4aa\n"` %[%033[1;33m%]%n@%/%R%[%033[0m%]%# '
+\set PROMPT1 '%👉 %[%033[1;33m%]%n@%/%:cluster_nm:%R%[%033[0m%]%# '
+\pset null '∅'
 \set QUIET off
