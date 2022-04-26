@@ -19,7 +19,7 @@ with x as (select  count(*), state from pg_stat_activity where datname is not nu
 \pset pager on
 \pset tuples_only off
 
-select setting v_cn from pg_settings where name ='cluster_name' \gset
+select setting v_cluster_name from pg_settings where name ='cluster_name' \gset
 
 \set clients_by_state 'select count(*),state from pg_stat_activity group by 2;'
 \set clients_idle 'select count(*),state from pg_stat_activity where state <> \'active\' group by 2;'
@@ -32,5 +32,5 @@ select setting v_cn from pg_settings where name ='cluster_name' \gset
 
 \setenv PAGER 'less -S'
 
-\set PROMPT1 '%👉 %[%033[1;33m%]%n@%/[%:v_cn:]%R%[%033[0m%]%# '
+\set PROMPT1 '%👉 %[%033[1;33m%]%n@%/[%:v_cluster_name:]%R%[%033[0m%]%# '
 \set QUIET off
